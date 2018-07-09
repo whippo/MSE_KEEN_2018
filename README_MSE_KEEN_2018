@@ -1,0 +1,159 @@
+This MSE_KEEN_2018 readme file was generated on 2018-07-09 by Ross Whippo	
+	
+_______________________________________	
+GENERAL INFORMATION	
+_______________________________________	
+	
+Title of dataset:	MSE_KEEN_2018
+	
+Author Information	
+	
+Princinpal Investigator Contact Information	
+Name:	Aaron W. E. Galloway 
+Institution:	Oregon Institute of Marine Biology
+Address:	63466 Boat Basin Rd, Charleston, OR 97420
+Email:	aaron.galloway@gmail.com
+	
+Associate Investigator Contact Information	
+Name:	Alexander T. Lowe
+Institution:	University of Washington
+Address:	24 Kincaid Hall, Seattle, WA 98105
+Email:	alowe70@uw.edu
+	
+Alternate Contact Information	
+Name:	Margaret S. Turner
+Institution:	Friday Harbor Laboratories
+Address:	620 University Rd, Friday Harbor, WA 98250
+Email:	msturn@uw.edu
+	
+Date of data collection (single date, range, approximate date): 	2018-06-21:2018-06-22
+	
+Geographic location of data collection:	South West tip of Shaw Island, WA, USA: 48.551797, -122.979195 (APPX VALUES)
+	
+Funding sources that supported the collection of the data: 	University of Oregon, University of Washington - Friday Harbor Laboratories
+	
+_______________________________________	
+SHARING/ACCESS INFORMATION	
+_______________________________________	
+	
+Licenses/restrictions placed on the data: 	NA
+	
+Links to publications that cite or use the data:	NA
+	
+Links to other publicly accessible location of the data:	NA
+	
+Links/relationships to ancillary data sets:	NA
+	
+Was data derived from another source?	NO
+If yes, list source:	NA
+	
+Recommended citation for the data:	NA
+	
+_______________________________________	
+DATA/FILE OVERVIEW	
+_______________________________________	
+	
+File List	
+Filename:	FILENAME.EXT
+Short description:	DESCRIPTION
+	
+Filename:	NA
+Short description:	NA
+	
+Filename:	NA
+Short description:	NA
+	
+Relationship between files:	NA
+	
+Additional related data collected that was not included in the current data package:	NA
+	
+Are there multiple versions of the dataset?	YES/NO
+If yes, list versions	
+Name of file that was updated:	NA
+Why was the file updated?	NA
+When was the file updated?	NA
+Name of file that was updated:	NA
+Why was the file updated?	NA
+When was the file updated?	NA
+	
+_______________________________________	
+METHODOLOGICAL INFORMATION	
+_______________________________________	
+	
+Description of methods used for collection/generation of data:	Methods used were derived from the Kelp Ecosystem Ecology Network Experimental protocol (KEEN: https://github.com/kelpecosystems/). Specifically the experimental portion of the methods were used as described in the manual, with the exception of the number of plots. 6 total plots were created, 3 subjected to experimental kelp removal and 3 left as controls. A total of 4 quadrats of each type (UPC, open quadrat) were taken at the center of each plot. Data collected by Galloway and Lowe is to be considered the 'official' KEEN data taken out of Friday Harbor Labs. All data collected by other data collecters is reduntant student data to be used for comparative analysis. 
+	
+Methods for processing the data:	METHODS
+<describe how  the submitted data were generated from raw or collected data>	
+	
+Instrument- or software-specific information needed to interpret the data:	NA
+	
+Standards and calibration information, if appropriate:	NA
+	
+Environmental/experimental conditions:	CONDITIONS
+	
+Describe any quality-assurance procedures performed on the data:	QAQC
+	
+People involved with sample collection, processing, analysis and/or submission:	
+
+Aaron W. E. Galloway: PI/data collection/QAQC
+Alexander T. Lowe: PI/data collection/QAQC
+Abigail Ames: Data collection/QAQC
+Sara Bunker: Data collection/QAQC
+Chanelle Cadot: Data collection/QAQC
+Caiti Guerin: Data collection/QAQC
+John Dorsett: Data collection/QAQC
+Willem Weertman: Data collection/QAQC
+Demetra Panos: Data collection/QAQC
+Sarah Yerrace: Data collection/QAQC
+Reyn Yoshioka: Data collection/QAQC
+Francesca Mollinari: Data collection/QAQC
+Molly Payne: Data collection/QAQC
+Parker Hayne: Data collection/QAQC
+Margaret S. Turner: QAQC
+Ross Whippo: Data Analysis
+	
+_______________________________________	
+DATA-SPECIFIC INFORMATION FOR: FILENAME	
+_______________________________________	
+<create sections for each dataset (or file if appropriate) included>	
+	
+Number of variables:	NUM VARIABLES
+	
+Number of cases/rows:	NUM ROWS
+	
+Variable List	
+Name:	VARIABLE NAME
+Description:	VARIABLE DESCRIPTION
+Value labels:	IF APPROPRIATE
+	
+Name:	VARIABLE NAME
+Description:	VARIABLE DESCRIPTION
+Value labels:	IF APPROPRIATE
+	
+Name:	VARIABLE NAME
+Description:	VARIABLE DESCRIPTION
+Value labels:	IF APPROPRIATE
+	
+Name:	VARIABLE NAME
+Description:	VARIABLE DESCRIPTION
+Value labels:	IF APPROPRIATE
+	
+Name:	VARIABLE NAME
+Description:	VARIABLE DESCRIPTION
+Value labels:	IF APPROPRIATE
+	
+Name:	VARIABLE NAME
+Description:	VARIABLE DESCRIPTION
+Value labels:	IF APPROPRIATE
+	
+Missing data codes	
+Code/symbol:	CODE HERE
+Definition:	DEF HERE
+	
+Code/symbol:	NA
+Definition:	NA
+	
+Specialized formats of other abbreviations used:	NA
+	
+<<<<<<<<<<END OF METADATA>>>>>>>>>>	
+

@@ -1,0 +1,9 @@
+SUBS_CODE,DatasheetName,modifier
+C,Cobble,(<25 cm)
+BS,Boulder small,(25-50 cm)
+BM,Boulder medium,(50-100 cm)
+BL,Boulde large,(>100 cm)
+B,Bedrock,
+SS,Shallow sand,(<1 cm)
+SH,Shell debris,
+S,Sand,(>1 cm)
