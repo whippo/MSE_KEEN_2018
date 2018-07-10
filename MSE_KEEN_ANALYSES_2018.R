@@ -1,11 +1,11 @@
 ###################################################################################
 #                                                                                ##
 # Title of Script                                                                ##
-# Data are current as of 2018-07-09                                              ##
+# Data are current as of 2018-07-10                                              ##
 # Data source: Marine Subtidal Ecology Course - Kelp Ecosystem Ecology Network - ##
 # Friday Harbor Labs - University of Oregon                                      ##
 # R code prepared by Ross Whippo                                                 ##
-# Last updated 2018-07-09                                                        ##
+# Last updated 2018-07-10                                                        ##
 #                                                                                ##
 ###################################################################################
 
@@ -115,7 +115,7 @@ names(quad_matrix)[names(quad_matrix)=="sum(COUNT)"] <- "TOT_COUNT"
 
 KEEN_mat_quad_full <- quad_matrix %>%
   spread(MO_SP_CODE, TOT_COUNT, fill = 0)
-KEEN_quad_mat_run <- KEEN_mat_quad_full[,c(3:62)]
+KEEN_quad_mat_run <- KEEN_mat_quad_full[,c(3:61)]
 
 # MDS of community
 KEEN_quad_mds <- metaMDS(KEEN_quad_mat_run)
@@ -130,7 +130,71 @@ chulls_quad <- ddply(plot_data_mds, .(COLLECTION_TYPE), function(df) df[chull(df
 detach(package:plyr)
 #plot_data_mds$PLOT <- as.factor(plot_data_mds$PLOT)
 
+###################################################################################
+# ANALYSES                                                                        #
+###################################################################################
 
+# All Richness
+All_rich <- quaddata %>%
+  select(PLOT, QUAD, DATA_TYPE, COUNT, COLLECTION_TYPE, MO_SP_CODE, GroupingCode) %>%
+  group_by(PLOT, QUAD, DATA_TYPE, COLLECTION_TYPE, MO_SP_CODE, GroupingCode) %>%
+  summarise(sum(COUNT))
+names(All_rich)[names(All_rich)=="sum(COUNT)"] <- "TOT_COUNT"
+
+# Extract Quadrats
+All_quad <- All_rich %>%
+  filter(DATA_TYPE == "QUAD")
+# Extract Animals
+algae <- c("Brown algae", "Green algae", "Red algae fleshy (fuct groups)
+", "Red algae fleshy", "Red algae coraline")
+Anim_quad <- All_quad %>%
+  filter(!GroupingCode %in% algae)
+# total redundant grouping codes
+Anim_quad <- Anim_quad %>%
+  ungroup() %>%
+  select(-c(GroupingCode, DATA_TYPE)) %>%
+  group_by(PLOT, QUAD, COLLECTION_TYPE, MO_SP_CODE, TOT_COUNT) %>%
+  summarise(sum(TOT_COUNT))
+names(Anim_quad)[names(Anim_quad)=="sum(TOT_COUNT)"] <- "NEW_COUNT"
+Anim_quad <- Anim_quad %>%
+  select(-TOT_COUNT)
+
+# spread quad animals
+Anim_spread_quad <- Anim_quad %>%
+  group_by(COLLECTION_TYPE) %>%
+  spread(MO_SP_CODE, NEW_COUNT, fill = 0)
+
+Anim_pool_quad <- Anim_spread_quad[,4:53]
+Anim_quad_plots <-Anim_spread_quad[,c(1:3)]
+Anim_quad_plots <-Anim_quad_plots %>%
+  unite_("PLOTQUAD_TYPE", c("PLOT", "QUAD", "COLLECTION_TYPE"), sep = "_", remove = FALSE)
+attach(Anim_quad_plots)
+Anim_quad_rich <- Anim_pool_quad %>%
+  specpool(PLOTQUAD_TYPE)
+Anim_quad_rich <- Anim_quad_rich %>%
+  bind_cols(Anim_quad_plots)
+Anim_quad_rich$PLOT <- as.factor(Anim_quad_rich$PLOT)
+
+
+# extract quad algae
+Algae_quad <- All_quad %>%
+  filter(GroupingCode %in% algae)
+
+# spread quad animals
+Algae_spread_quad <- Algae_quad %>%
+  group_by(COLLECTION_TYPE) %>%
+  spread(MO_SP_CODE, TOT_COUNT, fill = 0)
+
+Algae_pool_quad <- Algae_spread_quad[,6:14]
+Algae_quad_plots <-Algae_spread_quad[,c(1:2,4)]
+Algae_quad_plots <-Algae_quad_plots %>%
+  unite_("PLOTQUAD_TYPE", c("PLOT", "QUAD", "COLLECTION_TYPE"), sep = "_", remove = FALSE)
+attach(Algae_quad_plots)
+Algae_quad_rich <- Algae_pool_quad %>%
+  specpool(PLOTQUAD_TYPE)
+Algae_quad_rich <- Algae_quad_rich %>%
+  bind_cols(Algae_quad_plots)
+Algae_quad_rich$PLOT <- as.factor(Algae_quad_rich$PLOT)
 
 ###################################################################################
 # GENERATE FIGURES                                                                #
@@ -145,7 +209,7 @@ COUNT_GROUPS_TYPE_QUAD <- ggplot(quad_count_groups, aes(x = COLLECTION_TYPE, y =
   theme_minimal() + 
   scale_fill_viridis(discrete=TRUE) +
   labs(x="", y="Count") 
-COUNT_GROUPS_TYPE_QUAD
+#COUNT_GROUPS_TYPE_QUAD
 
 # Figure of counts of observed of groups by collection type for UPC
 COUNT_GROUPS_TYPE_UPC <- ggplot(UPC_count_groups, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = GroupingCode)) + 
@@ -153,7 +217,7 @@ COUNT_GROUPS_TYPE_UPC <- ggplot(UPC_count_groups, aes(x = COLLECTION_TYPE, y = T
   scale_fill_viridis(discrete=TRUE, option = "plasma") +
   labs(x="", y="Count") +
   ylim(0, 1250)
-COUNT_GROUPS_TYPE_UPC
+#COUNT_GROUPS_TYPE_UPC
 
 
 Figure1 <- ggarrange(COUNT_GROUPS_TYPE_QUAD, COUNT_GROUPS_TYPE_UPC, 
@@ -172,11 +236,12 @@ annotate_figure(Figure1, bottom = text_grob("Figure 1: Total contribution of tax
 # quadrats
 
 # MDS
-QUAD_MDS <- ggplot(plot_data_mds, aes(x=MDS1, y=MDS2, pch = COLLECTION_TYPE, color = PLOT)) +  
+QUAD_MDS <- ggplot(plot_data_mds, aes(x=MDS1, y=MDS2, pch = COLLECTION_TYPE, color = factor(PLOT))) + 
+  labs(color = "PLOT") +
   theme_minimal() +
   geom_polygon(data=chulls_quad, aes(x=MDS1, y=MDS2, group=COLLECTION_TYPE), fill=NA, color = "grey") +
   geom_point(size = 4) +
-  scale_color_viridis_c()
+  scale_color_viridis_d()
 
 Figure2 <- ggarrange(QUAD_MDS, 
                      ncol = 1, nrow = 1,
@@ -185,6 +250,33 @@ Figure2 <- ggarrange(QUAD_MDS,
 annotate_figure(Figure2, bottom = text_grob("Figure 2: MDS of open quadrat communities surveyed by students comparted to surveys \n conducted by instructors.", size = 10))
 
 # best size 700x500
+
+############### FIGURE 3
+# Richness of animals and algae
+# animal quadrats
+
+QUAD_RICH_ANIM <- ggplot(Anim_quad_rich, aes(x = PLOT, y = Species, fill=COLLECTION_TYPE)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_viridis_d(begin = 0.4, end = 0.8) +
+  ylab("Observed Animal Species Richness") +
+  xlab("Plot Number") 
+  
+QUAD_RICH_ALGAE <- ggplot(Algae_quad_rich, aes(x = PLOT, y = Species, fill=COLLECTION_TYPE)) +
+  geom_boxplot() +
+  theme_minimal() +
+  scale_fill_viridis_d(begin = 0.4, end = 0.8) +
+  ylab("Observed Algal Species Richness") +
+  xlab("Plot Number") 
+
+Figure3 <- ggarrange(QUAD_RICH_ANIM, QUAD_RICH_ALGAE, 
+                     ncol = 1, nrow = 2,
+                     labels = c("A", "B"),
+                     common.legend = TRUE, 
+                     legend = "right")
+annotate_figure(Figure3, bottom = text_grob("Figure 3: Observed measures of species richness for A) animals and B) algae \n in open quadrats measured by instructors and students", size = 10))
+
+# best size: 500x700
 
 #####
 #<<<<<<<<<<<<<<<<<<<<<<<<<<END OF SCRIPT>>>>>>>>>>>>>>>>>>>>>>>>#
