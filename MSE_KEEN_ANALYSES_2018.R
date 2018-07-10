@@ -184,7 +184,7 @@ Figure2 <- ggarrange(QUAD_MDS,
                      legend = "right")
 annotate_figure(Figure2, bottom = text_grob("Figure 2: MDS of open quadrat communities surveyed by students comparted to surveys \n conducted by instructors.", size = 10))
 
-# best size 600x850
+# best size 700x500
 
 #####
 #<<<<<<<<<<<<<<<<<<<<<<<<<<END OF SCRIPT>>>>>>>>>>>>>>>>>>>>>>>>#
