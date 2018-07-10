@@ -196,6 +196,24 @@ Algae_quad_rich <- Algae_quad_rich %>%
   bind_cols(Algae_quad_plots)
 Algae_quad_rich$PLOT <- as.factor(Algae_quad_rich$PLOT)
 
+
+
+# SPECIES ACCUMULATION
+
+# Instructors
+Anim_quad_instructors <- Anim_spread_quad %>%
+  filter(COLLECTION_TYPE == "INSTRUCTOR")
+Anim_quad_inst_pool <- Anim_quad_instructors[,4:53]
+inst_accum <- specaccum(Anim_quad_inst_pool)
+
+# Students
+Anim_quad_students <- Anim_spread_quad %>%
+  filter(COLLECTION_TYPE == "STUDENT")
+Anim_quad_stud_pool <- Anim_quad_students[,4:53]
+stud_accum <- specaccum(Anim_quad_stud_pool)
+
+
+
 ###################################################################################
 # GENERATE FIGURES                                                                #
 ###################################################################################
@@ -261,7 +279,8 @@ QUAD_RICH_ANIM <- ggplot(Anim_quad_rich, aes(x = PLOT, y = Species, fill=COLLECT
   scale_fill_viridis_d(begin = 0.4, end = 0.8) +
   ylab("Observed Animal Species Richness") +
   xlab("Plot Number") 
-  
+
+# algal quadrats
 QUAD_RICH_ALGAE <- ggplot(Algae_quad_rich, aes(x = PLOT, y = Species, fill=COLLECTION_TYPE)) +
   geom_boxplot() +
   theme_minimal() +
@@ -277,6 +296,21 @@ Figure3 <- ggarrange(QUAD_RICH_ANIM, QUAD_RICH_ALGAE,
 annotate_figure(Figure3, bottom = text_grob("Figure 3: Observed measures of species richness for A) animals and B) algae \n in open quadrats measured by instructors and students", size = 10))
 
 # best size: 500x700
+
+############### FIGURE 4
+# Species accumulation curves for animals in open quads
+# animal quadrats
+
+# function to create alpha channel in plot() function
+col2alpha <- function(col, alpha) {
+  col_rgb <- col2rgb(col)/255
+  rgb(col_rgb[1], col_rgb[2], col_rgb[3], alpha = alpha)
+}
+
+plot(inst_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#2D708EFF", "1"), ylim = c(0,45), xlab = "Quadrats Sampled", ylab = "Number of Species")
+plot(stud_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#73D055FF", "0.5"), add = TRUE)
+
+# best size: 550x550
 
 #####
 #<<<<<<<<<<<<<<<<<<<<<<<<<<END OF SCRIPT>>>>>>>>>>>>>>>>>>>>>>>>#
