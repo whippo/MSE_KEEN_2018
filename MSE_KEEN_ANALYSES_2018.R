@@ -57,6 +57,7 @@ library(ggplot2)
 library(viridis)
 library(ggpubr)
 library(vegan)
+library(stringr)
 
 ###################################################################################
 # READ IN AND PREPARE DATA                                                        #
@@ -214,6 +215,64 @@ stud_accum <- specaccum(Anim_quad_stud_pool)
 
 
 
+# UNDER/OVER ESTIMATION
+# Use All_quad for as starting point, use Anim_quad for animal quadrats and 
+# Algae_quad for algae quadrats
+
+All_UPC <- All_rich %>%
+  filter(DATA_TYPE == "UPC")
+# Extract Algae
+Algae_UPC <- All_UPC %>%
+  filter(GroupingCode %in% algae)
+
+# Extract Substrate
+Subs_UPC <- All_UPC %>%
+  filter(GroupingCode == "Abiotic substrate")
+
+
+# sum animal quads
+Anim_sums <- Anim_quad %>%
+  group_by(MO_SP_CODE, COLLECTION_TYPE) %>%
+  summarise(sum(NEW_COUNT))
+names(Anim_sums)[names(Anim_sums) == "sum(NEW_COUNT)"] <- "NEW_COUNT"
+
+# Spread out animal quads
+Anim_spread_overcount <- Anim_sums %>%
+  spread(COLLECTION_TYPE, NEW_COUNT, fill = 0)
+# Add column of differences
+Anim_spread_overcount$diff <- Anim_spread_overcount$STUDENT - Anim_spread_overcount$INSTRUCTOR
+# identify percentiles
+quantile(Anim_spread_overcount$diff, prob = seq(0, 1, length = length(Anim_spread_overcount$diff)), type = 5)
+# top 5% = <24, bottom 5% = >-19
+
+Anim_quad_topbot <- Anim_spread_overcount %>%
+  filter(diff > 23 | diff < -18)
+Anim_quad_topbot <- left_join(Anim_quad_topbot, codes, by="MO_SP_CODE")
+
+
+# sum algae quads
+Algae_sums <- Algae_quad %>%
+  group_by(MO_SP_CODE, COLLECTION_TYPE) %>%
+  summarise(sum(TOT_COUNT))
+names(Algae_sums)[names(Algae_sums) == "sum(TOT_COUNT)"] <- "NEW_COUNT"
+
+# Spread out algae quads
+Algae_spread_overcount <- Algae_sums %>%
+  spread(COLLECTION_TYPE, NEW_COUNT, fill = 0)
+# Add column of differences
+Algae_spread_overcount$diff <- Algae_spread_overcount$STUDENT - Algae_spread_overcount$INSTRUCTOR
+# identify percentiles
+quantile(Algae_spread_overcount$diff, prob = seq(0, 1, length = length(Algae_spread_overcount$diff)), type = 5)
+# top 12.5% = <5, bottom 12.5% = >-65
+
+Algae_quad_topbot <- Algae_spread_overcount %>%
+  filter(diff > 6 | diff < -66)
+Algae_quad_topbot <- left_join(Algae_quad_topbot, codes, by="MO_SP_CODE")
+
+
+
+
+
 ###################################################################################
 # GENERATE FIGURES                                                                #
 ###################################################################################
@@ -307,15 +366,43 @@ col2alpha <- function(col, alpha) {
   rgb(col_rgb[1], col_rgb[2], col_rgb[3], alpha = alpha)
 }
 
+par(oma = c(2,2,2,2))
 plot(inst_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#2D708EFF", "1"), ylim = c(0,45), xlab = "Quadrats Sampled", ylab = "Number of Species")
-ANIM_QUAD_SPECACCUM <- plot(stud_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#73D055FF", "0.5"), add = TRUE)
+plot(stud_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#73D055FF", "0.5"), add = TRUE) +
+  mtext("Figure 4: New species as a function of number of quadrats sampled shown with \n 95% confidence intervals for instructors (blue) and students (green).", side = 1, line = 5, cex = 0.8)
 
-Figure4 <- ggarrange(ANIM_QUAD_SPECACCUM, 
-                     ncol = 1, nrow = 1,
-                     legend = "right")
-annotate_figure(Figure4, bottom = text_grob("Figure 4: New species as a function of number of quadrats sampled shown with 95% confidence intervals for instructors (blue) and students (green)", size = 10))
+
 
 # best size: 550x550
+
+############### FIGURE 5
+# Over and underestimation of groups comparing student to instructor data
+# animal quadrats
+
+Anim_quad_topbot_fig <- ggplot(Anim_quad_topbot, aes(x = Genus, y = diff)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  ylim(-100, 350) +
+  ylab("Difference in Counts") +
+  scale_x_discrete(labels = function(x) str_wrap(x, width = 10)) +
+  geom_hline(yintercept = 0, color = "#FDE725FF", size = 2)
+
+Algae_quad_topbot_fig <- ggplot(Algae_quad_topbot, aes(x = Genus, y = diff)) +
+  geom_bar(stat = "identity") +
+  theme_minimal() +
+  ylim(-120, 50) +
+  ylab("Difference in Counts") +
+  geom_hline(yintercept = 0, color = "#73D055FF", size = 2)
+
+Figure5 <- ggarrange(Anim_quad_topbot_fig, Algae_quad_topbot_fig, 
+                     ncol = 1, nrow = 2,
+                     labels = c("A", "B"))
+annotate_figure(Figure5, bottom = text_grob("Figure 5: Absolute difference in total count differences between instructor and student open quadrats for \n A) animals and B) algae. Only differences magnitude for the top ~5% for animals and ~10% for algae are shown. \n Instructor values are considered baseline (0), positive values indicate student overcounting, negative values \n indicate undercounting.", size = 10))
+
+# best size: 660x800
+
+
+
 
 #####
 #<<<<<<<<<<<<<<<<<<<<<<<<<<END OF SCRIPT>>>>>>>>>>>>>>>>>>>>>>>>#
