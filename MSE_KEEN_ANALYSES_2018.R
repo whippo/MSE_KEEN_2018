@@ -308,7 +308,12 @@ col2alpha <- function(col, alpha) {
 }
 
 plot(inst_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#2D708EFF", "1"), ylim = c(0,45), xlab = "Quadrats Sampled", ylab = "Number of Species")
-plot(stud_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#73D055FF", "0.5"), add = TRUE)
+ANIM_QUAD_SPECACCUM <- plot(stud_accum, ci.type="poly", col="#FDE725FF", lwd=2, ci.lty=0, ci.col=col2alpha("#73D055FF", "0.5"), add = TRUE)
+
+Figure4 <- ggarrange(ANIM_QUAD_SPECACCUM, 
+                     ncol = 1, nrow = 1,
+                     legend = "right")
+annotate_figure(Figure4, bottom = text_grob("Figure 4: New species as a function of number of quadrats sampled shown with 95% confidence intervals for instructors (blue) and students (green)", size = 10))
 
 # best size: 550x550
 
