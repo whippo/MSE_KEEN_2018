@@ -100,6 +100,37 @@ quad_count_groups <- QUADS %>%
   summarise(sum(COUNT))
 names(quad_count_groups)[names(quad_count_groups)=="sum(COUNT)"] <- "TOT_COUNT"
 
+# summarize counts of organisms for quads by group without CALI
+nocali_QUADS <- QUADS %>%
+  filter(!MO_SP_CODE == "CALI")
+
+quad_count_nocali <- nocali_QUADS %>%
+  group_by(COLLECTION_TYPE, GroupingCode) %>%
+  summarise(sum(COUNT))
+names(quad_count_nocali)[names(quad_count_nocali)=="sum(COUNT)"] <- "TOT_COUNT"
+
+# summarize counts of organisms for quads by group for brown algae only
+brown_QUADS <- QUADS %>%
+  filter(GroupingCode == "Brown algae")
+brown_QUADS$MO_SP_CODE <- as.factor(brown_QUADS$MO_SP_CODE)
+# rename and regroup brown algae
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="SAJU"] <- "Juv. Kelp"
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="UKKJ"] <- "Juv. Kelp"
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="SALANI"] <- "Saccharina spp."
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="SALA"] <- "Saccharina spp."
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="SACO"] <- "Saccharina spp."
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="COCO"] <- "C. costata"
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="AGFI"] <- "A. fimbriatum"
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="AGCL"] <- "A. clathratum"
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="DELI"] <- "D. ligulatum"
+levels(brown_QUADS$MO_SP_CODE)[levels(brown_QUADS$MO_SP_CODE)=="SAMU"] <- "S. muticum"
+
+quad_count_browns <- brown_QUADS %>%
+  group_by(COLLECTION_TYPE, MO_SP_CODE) %>%
+  summarise(sum(COUNT))
+names(quad_count_browns)[names(quad_count_browns)=="sum(COUNT)"] <- "TOT_COUNT"
+names(quad_count_browns)[names(quad_count_browns)=="MO_SP_CODE"] <- "Species"
+
 # summarize counts of organisms and substrate for UPC by group
 UPC_count_groups <- UPC %>%
   subset(DATA_TYPE == "UPC") %>%
@@ -288,6 +319,13 @@ COUNT_GROUPS_TYPE_QUAD <- ggplot(quad_count_groups, aes(x = COLLECTION_TYPE, y =
   labs(x="", y="Count") 
 #COUNT_GROUPS_TYPE_QUAD
 
+# Figure of counts of observed groups by collection type for open quads NO CALI
+COUNT_GROUPS_TYPE_NOCALI <- ggplot(quad_count_nocali, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = GroupingCode)) + 
+  theme_minimal() + 
+  scale_fill_viridis(discrete=TRUE) +
+  labs(x="", y="Count") 
+#COUNT_GROUPS_TYPE_NOCALI
+
 # Figure of counts of observed of groups by collection type for UPC
 COUNT_GROUPS_TYPE_UPC <- ggplot(UPC_count_groups, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = GroupingCode)) + 
   theme_minimal() + 
@@ -296,16 +334,28 @@ COUNT_GROUPS_TYPE_UPC <- ggplot(UPC_count_groups, aes(x = COLLECTION_TYPE, y = T
   ylim(0, 1250)
 #COUNT_GROUPS_TYPE_UPC
 
+# Figure of counts of observed groups by collection type for open quads browns only
+COUNT_GROUPS_TYPE_BROWNS <- ggplot(quad_count_browns, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = Species)) + 
+  theme_minimal() + 
+  scale_fill_viridis(discrete=TRUE, option = 3, begin = 0.2) +
+  labs(x="", y="Count") 
+#COUNT_GROUPS_TYPE_NOCALI
 
-Figure1 <- ggarrange(COUNT_GROUPS_TYPE_QUAD, COUNT_GROUPS_TYPE_UPC, 
-                     labels = c("A", "B"),
+
+Figure1 <- ggarrange(ggarrange(COUNT_GROUPS_TYPE_QUAD, COUNT_GROUPS_TYPE_NOCALI,
+                               labels = c("A", "B"),
+                               ncol = 1, nrow = 2,
+                               common.legend = TRUE,
+                               legend = "left"), ggarrange(COUNT_GROUPS_TYPE_UPC, COUNT_GROUPS_TYPE_BROWNS,
+                     labels = c("C", "D"),
                      ncol = 1, nrow = 2,
                      common.legend = FALSE, 
                      legend = "right",
-                     align = "v")
-annotate_figure(Figure1, bottom = text_grob("Figure 1: Total contribution of taxonomic groupings to A) open quadrat and B) UPC \n surveys done by students in comparison to the definitive dataset.", size = 10))
+                     align = "v"), 
+                     ncol = 2, nrow = 1)
+annotate_figure(Figure1, bottom = text_grob("Figure 1: Total contribution of taxonomic groupings to open quadrat surveys A) with Calliostoma and B) without Callistoma, in C) \n UPC quadrats, and D) of brown algal species in open quadrat surveys done by students in comparison to an instructor dataset.", size = 10))
 
-# best size 600x850
+# best size 1000x800
 
 
 ############### FIGURE 2
@@ -406,3 +456,31 @@ annotate_figure(Figure5, bottom = text_grob("Figure 5: Absolute difference in to
 
 #####
 #<<<<<<<<<<<<<<<<<<<<<<<<<<END OF SCRIPT>>>>>>>>>>>>>>>>>>>>>>>>#
+
+### SCRATCH PAD
+
+# DRILL IN ON BROWN ALGAE
+
+smallspp <- c("Molluscs (general)", "Urchins", "Brown algae", "Stars")
+
+subset_stack_data <- quad_count_groups %>%
+  filter(GroupingCode %in% smallspp)
+
+# Figure of counts of observed groups by collection type for open quads
+ggplot(subset_stack_data, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = GroupingCode)) + 
+  theme_minimal() + 
+  scale_fill_viridis(discrete=TRUE) +
+  labs(x="", y="Count") 
+#COUNT_GROUPS_TYPE_QUAD
+
+
+# NO CALLIOSTOMA
+
+# summarize counts of organisms for quads by group
+nocali_QUADS <- QUADS %>%
+  filter(!MO_SP_CODE == "CALI")
+
+quad_count_groups <- nocali_QUADS %>%
+  group_by(COLLECTION_TYPE, GroupingCode) %>%
+  summarise(sum(COUNT))
+names(quad_count_groups)[names(quad_count_groups)=="sum(COUNT)"] <- "TOT_COUNT"
