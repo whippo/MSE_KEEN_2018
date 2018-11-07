@@ -358,7 +358,7 @@ annotate_figure(Figure1, bottom = text_grob("Figure 1: Total contribution of tax
 # best size 1000x800
 
 
-#### Figure 1.1 for WSN - removed rare spp, added genus names, incresed resolution
+#### Figure 1.1 and 1.2 for WSN - removed rare spp, added genus names, incresed resolution
 
 # remove spp counts less than 10
 
@@ -366,43 +366,32 @@ UPC_major_groups <- UPC_count_groups %>%
   subset(TOT_COUNT > 9)
 
 # Figure of counts of observed of groups by collection type for UPC
-COUNT_GROUPS_MAJOR_UPC <- ggplot(UPC_major_groups, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = GroupingCode)) + 
+ggplot(UPC_major_groups, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = GroupingCode)) + 
   theme_minimal() + 
   scale_fill_viridis(discrete=TRUE, option = "plasma") +
   labs(x="", y="Count") +
-  theme(text = element_text(size=20)) +
-  ylim(0, 1250)
+  theme(text = element_text(size=20)) 
 #COUNT_GROUPS_TYPE_UPC
+
+ggsave("20181107_MSE_KEEN_Fig1-1", device = "png", width = 8, height = 7, units = 'in', dpi = 500)
+
 
 # ADD GENUS NAMES
 quad_genus_browns <- quad_count_browns
 
 # rename factors
-levels(quad_genus_browns)[levels(quad_genus_browns)=="A. clathratum"] <- "Agarum clathratum"
-levels(quad_genus_browns)[levels(quad_genus_browns)=="A. fimbriatum"] <- "Agarum fimbriatum"
-levels(quad_genus_browns)[levels(quad_genus_browns)=="C. costata"] <- "Costaria costata"
-
-
+quad_genus_browns$Species <- recode(quad_genus_browns$Species, `A. clathratum` = "Agarum clathratum", `A. fimbriatum` = "Agarum fimbriatum", 'C. costata' = "Costaria costata", 'D. ligulatum' = "Desmarestia ligulata", 'S. muticum' = "Sargassum muticum")
 
 # Figure of counts of observed groups by collection type for open quads browns only
-COUNT_GROUPS_TYPE_BROWNS <- ggplot(quad_count_browns, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = Species)) + 
+ggplot(quad_genus_browns, aes(x = COLLECTION_TYPE, y = TOT_COUNT)) + geom_bar(stat = "identity", aes(fill = Species)) + 
   theme_minimal() + 
   scale_fill_viridis(discrete=TRUE, option = 3, begin = 0.2) +
-  labs(x="", y="Count") 
+  labs(x="", y="Count") +
+  theme(text = element_text(size=20))
 #COUNT_GROUPS_TYPE_NOCALI
 
-
-Figure1.1 <- ggarrange(ggarrange(COUNT_GROUPS_TYPE_QUAD, COUNT_GROUPS_TYPE_NOCALI,
-                               labels = c("A", "B"),
-                               ncol = 1, nrow = 2,
-                               common.legend = TRUE,
-                               legend = "left"), ggarrange(COUNT_GROUPS_TYPE_UPC, COUNT_GROUPS_TYPE_BROWNS,
-                                                           labels = c("C", "D"),
-                                                           ncol = 1, nrow = 2,
-                                                           common.legend = FALSE, 
-                                                           legend = "right",
-                                                           align = "v"), 
-                     ncol = 2, nrow = 1)
+# Figure 1.1 = Groups in UPC
+ggsave("20181107_MSE_KEEN_Fig1-2", device = "png", width = 8, height = 7, units = 'in', dpi = 500)
 
 
 ############### FIGURE 2
@@ -431,26 +420,30 @@ annotate_figure(Figure2, bottom = text_grob("Figure 2: MDS of open quadrat commu
 
 QUAD_RICH_ANIM <- ggplot(Anim_quad_rich, aes(x = PLOT, y = Species, fill=COLLECTION_TYPE)) +
   geom_boxplot() +
-  theme_minimal() +
+  theme_classic() +
   scale_fill_viridis_d(begin = 0.4, end = 0.8) +
   ylab("Observed Animal Species Richness") +
-  xlab("Plot Number") 
+  xlab("Plot Number") +
+  theme(text = element_text(size=20))
 
 # algal quadrats
 QUAD_RICH_ALGAE <- ggplot(Algae_quad_rich, aes(x = PLOT, y = Species, fill=COLLECTION_TYPE)) +
   geom_boxplot() +
-  theme_minimal() +
+  theme_classic() +
   scale_fill_viridis_d(begin = 0.4, end = 0.8) +
   ylab("Observed Algal Species Richness") +
-  xlab("Plot Number") 
+  xlab("Plot Number") +
+  theme(text = element_text(size=20)) +
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 20, b = 0, l = 0)))
 
 # overall instructor vs. student richness summary of algae
 OVERALL_RICH_ALGAE <- ggplot(Algae_quad_rich, aes(x = COLLECTION_TYPE, y= Species, fill = COLLECTION_TYPE)) +
   geom_boxplot() +
-  theme_minimal() +
+  theme_classic() +
   scale_fill_viridis_d(begin = 0.4, end = 0.8) +
   xlab("Collectors") +
-  ylab("")
+  ylab("") +
+  theme(text = element_text(size=20))
 
 Figure3 <- ggarrange(QUAD_RICH_ANIM, QUAD_RICH_ALGAE, 
                      ncol = 1, nrow = 2,
@@ -462,11 +455,14 @@ annotate_figure(Figure3, bottom = text_grob("Figure 3: Observed measures of spec
 # best size: 500x700
 
 # Figure 3.1 for algae only and overall trends
-Figure3.1 <-ggarrange(QUAD_RICH_ALGAE, OVERALL_RICH_ALGAE,
+ggarrange(QUAD_RICH_ALGAE, OVERALL_RICH_ALGAE,
                       ncol = 2, nrow = 1,
                       common.legend = TRUE,
                       legend = "right",
                       widths = c(2,1))
+
+ggsave("20181107_MSE_KEEN_Fig3-1", device = "png", width = 15, height = 7, units = 'in', dpi = 500)
+
 
 ############### FIGURE 4
 # Species accumulation curves for animals in open quads
