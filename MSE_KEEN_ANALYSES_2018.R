@@ -58,6 +58,7 @@ library(viridis)
 library(ggpubr)
 library(vegan)
 library(stringr)
+library(readr)
 
 ###################################################################################
 # READ IN AND PREPARE DATA                                                        #
@@ -161,6 +162,14 @@ library(plyr)
 chulls_quad <- ddply(plot_data_mds, .(COLLECTION_TYPE), function(df) df[chull(df$MDS1, df$MDS2), ])
 detach(package:plyr)
 #plot_data_mds$PLOT <- as.factor(plot_data_mds$PLOT)
+
+# create list of instructor-only species codes used on surveys
+instructor_only <- quaddata %>%
+  filter(OBSERVER %in% c('Lowe', 'Galloway'))
+instructor_codes <- instructor_only %>%
+  select(MO_SP_CODE, NameOnSheet) %>%
+  distinct(MO_SP_CODE, NameOnSheet) 
+write_csv(instructor_codes, "KEEN_Codes_Instructor.csv")
 
 ###################################################################################
 # ANALYSES                                                                        #
