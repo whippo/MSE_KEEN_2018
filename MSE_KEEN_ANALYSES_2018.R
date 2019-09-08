@@ -59,6 +59,7 @@ library(ggpubr)
 library(vegan)
 library(stringr)
 library(readr)
+library(dabestr)
 
 ###################################################################################
 # READ IN AND PREPARE DATA                                                        #
@@ -169,7 +170,7 @@ instructor_only <- quaddata %>%
 instructor_codes <- instructor_only %>%
   select(MO_SP_CODE, NameOnSheet) %>%
   distinct(MO_SP_CODE, NameOnSheet) 
-write_csv(instructor_codes, "KEEN_Codes_Instructor.csv")
+#write_csv(instructor_codes, "KEEN_Codes_Instructor.csv")
 
 ###################################################################################
 # ANALYSES                                                                        #
@@ -525,6 +526,16 @@ annotate_figure(Figure5, bottom = text_grob("Figure 5: Absolute difference in to
 #<<<<<<<<<<<<<<<<<<<<<<<<<<END OF SCRIPT>>>>>>>>>>>>>>>>>>>>>>>>#
 
 ### SCRATCH PAD
+
+
+# dabestr visualzations of data
+
+richness_animquad_dabest <- 
+  Anim_spread_quad %>%
+  dabest(SITE, COUNT, idx = c("South Shaw", "Turn Rock"), paired = FALSE)
+
+
+plot(algalUPC_dabest, color.column = GroupingCode)
 
 # DRILL IN ON BROWN ALGAE
 
